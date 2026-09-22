@@ -1,5 +1,9 @@
 # wxq — 微信本地聊天记录查询工具
 
+[![CI](https://github.com/vpcoderli/wxq/actions/workflows/ci.yml/badge.svg)](https://github.com/vpcoderli/wxq/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 > WeChat local chat history query — CLI + MCP server for AI agents
 > 微信聊天记录 · 本地数据库解密 · 命令行查询 · MCP 服务
 
@@ -232,6 +236,9 @@ in `--strict` mode with no errors.
 
 Uncovered code is concentrated in the platform-specific process-memory scanners (`keys/`), which
 require a live WeChat process and OS-level memory access and so cannot run in CI.
+
+CI runs the suite on Python 3.10–3.13 (Linux) plus one job each on macOS and Windows, then
+`mypy --strict`, then a wheel build that asserts `py.typed` and the `bin/` scanner are packaged.
 
 ## License
 

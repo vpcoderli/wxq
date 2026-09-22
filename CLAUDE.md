@@ -27,6 +27,11 @@ python -m build                    # wheel + sdist into dist/ (needs `pip instal
 
 `pytest` defaults to `-v --tb=short` via `[tool.pytest.ini_options]`.
 
+CI (`.github/workflows/ci.yml`) runs the same suite on Python 3.10–3.13 (Linux) plus macOS and
+Windows jobs on 3.12, then `mypy --strict`, then a wheel build that fails if `py.typed` or the
+`bin/` scanner binary is missing from the artifact. The Windows job exists because `key_path_variants()`
+and `DBCache` branch on `os.sep` — changes there must stay green on all three platforms.
+
 The `keys/` scanners are deliberately uncovered: they need a live WeChat process and OS-level
 memory access, so they cannot run in CI. Don't chase coverage there.
 
