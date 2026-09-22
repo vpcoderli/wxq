@@ -8,6 +8,7 @@ version = "1.0.0"
 description = "微信本地聊天记录查询工具 — WeChat local chat history query, CLI + MCP server for AI agents"
 readme = "README.md"
 license = "MIT"
+authors = [{ name = "sakya" }]
 requires-python = ">=3.10"
 keywords = [
     "wechat", "weixin", "微信", "chat-history", "chatlog",
@@ -38,6 +39,12 @@ dev = [
     "pytest-cov>=5.0",
     "mypy>=1.10",
 ]
+
+[project.urls]
+Homepage = "https://github.com/vpcoderli/wxq"
+Repository = "https://github.com/vpcoderli/wxq"
+Issues = "https://github.com/vpcoderli/wxq/issues"
+Changelog = "https://github.com/vpcoderli/wxq/releases"
 
 [project.scripts]
 wxq = "wxq.cli:main"

@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/vpcoderli/wxq/actions/workflows/ci.yml/badge.svg)](https://github.com/vpcoderli/wxq/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/vpcoderli/wxq/blob/main/LICENSE)
 
 > WeChat local chat history query — CLI + MCP server for AI agents
 > 微信聊天记录 · 本地数据库解密 · 命令行查询 · MCP 服务
