@@ -11,8 +11,9 @@ license = "MIT"
 authors = [{ name = "sakya" }]
 requires-python = ">=3.10"
 keywords = [
-    "wechat", "weixin", "微信", "chat-history", "chatlog",
-    "mcp", "mcp-server", "cli", "sqlcipher", "sqlite", "ai-agent",
+    "wechat", "weixin", "微信", "chat-history", "chat-export", "chatlog",
+    "mcp", "mcp-server", "claude", "ai-agents",
+    "cli", "sqlcipher", "sqlite", "decryption",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
