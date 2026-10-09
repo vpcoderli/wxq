@@ -35,6 +35,23 @@ and `DBCache` branch on `os.sep` — changes there must stay green on all three 
 The `keys/` scanners are deliberately uncovered: they need a live WeChat process and OS-level
 memory access, so they cannot run in CI. Don't chase coverage there.
 
+## Releasing
+
+`.github/workflows/release.yml` publishes to PyPI on **GitHub Release publication** using trusted
+publishing (OIDC) — there is no PyPI token stored in this repo or in Actions secrets. PyPI trusts
+three names exactly: this repository, the workflow *filename* `release.yml`, and the `pypi`
+environment. **Renaming the workflow file, or changing the environment name, silently breaks
+publishing** until the publisher is re-registered on PyPI.
+
+The workflow splits build from publish on purpose: only the `publish` job gets `id-token: write`,
+and it does nothing but upload files the `build` job already produced. The publish action is pinned
+by commit digest, not by tag, because it is handed the identity that can publish the package.
+
+To cut a release: bump `version` in `pyproject.toml`, commit, tag `vX.Y.Z`, push the tag, then
+publish a GitHub Release for it. A tag that disagrees with `pyproject.toml`'s version fails the
+build job before anything reaches PyPI. `skip-existing` is deliberately off — re-publishing an
+existing version should fail loudly rather than appear to succeed.
+
 ## Architecture
 
 ### Dependency spine

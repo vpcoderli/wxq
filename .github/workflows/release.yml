@@ -1,0 +1,91 @@
+name: Release
+
+# Publishes to PyPI via trusted publishing (OIDC) — no API token is stored
+# anywhere. PyPI is configured to trust exactly this repository, this workflow
+# filename, and the `pypi` environment below; changing any of those three names
+# breaks the trust relationship and the publish will be rejected.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Nothing is granted by default; each job opts into only what it needs.
+permissions: {}
+
+jobs:
+  build:
+    name: build + verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Build
+        run: python -m pip install --upgrade pip build && python -m build
+
+      - name: Refuse to publish if the tag and the package version disagree
+        if: github.event_name == 'release'
+        run: |
+          python - <<'PY'
+          import os, pathlib, sys, tomllib
+          version = tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"]
+          tag = os.environ["TAG"].removeprefix("v")
+          if version != tag:
+              sys.exit(f"tag {tag!r} does not match pyproject version {version!r}")
+          print(f"tag and version agree: {version}")
+          PY
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+
+      - name: Verify package data made it into the wheel
+        run: |
+          python - <<'PY'
+          import glob, zipfile, sys
+          whl = glob.glob("dist/*.whl")[0]
+          names = zipfile.ZipFile(whl).namelist()
+          required = ["wxq/py.typed", "wxq/bin/find_all_keys_macos.arm64"]
+          missing = [r for r in required if r not in names]
+          if missing:
+              sys.exit(f"missing from wheel: {missing}")
+          print(f"{whl}: {len(names)} files, package data present")
+          PY
+
+      - name: Check metadata renders on PyPI
+        run: python -m pip install --upgrade twine && python -m twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    # The build job above runs untrusted-ish work (installing and executing
+    # build backends). Only this job — which does nothing but upload the
+    # already-built files — is allowed to mint an OIDC token.
+    permissions:
+      id-token: write
+    environment:
+      name: pypi
+      url: https://pypi.org/project/wxq/
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      # Pinned to the commit behind v1.14.2. This action is handed the identity
+      # that can publish the package, so it is pinned by digest rather than by a
+      # moving tag or branch.
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
+        # No `skip-existing`: if a version was already uploaded, this should fail
+        # loudly rather than appear to succeed while publishing nothing.
