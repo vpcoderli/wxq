@@ -89,7 +89,7 @@ wxq history "Alice" --start-time "2024-01-01" --end-time "2024-06-30"
 wxq contacts --query "Li"
 
 # Contact details
-wxq contact-detail "Alice"
+wxq contacts --detail "Alice"
 
 # Group members
 wxq members "Work Group"

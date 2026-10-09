@@ -116,9 +116,26 @@ file's directory.
 - Broad `except Exception` in `ContactStore` and the table-discovery loops is intentional: a single
   corrupt or partially-written shard should degrade to empty results, not crash the query.
 
+## SKILL.md
+
+`SKILL.md` at the repo root makes this repo installable as a Claude skill (YAML frontmatter with
+`name`/`description`, plus `allowed-tools: Bash(wxq:*)`). It is read by agents, not packaged — it
+stays out of the wheel and sdist.
+
+`tests/test_skill_doc.py` diffs SKILL.md against Click's own command registry: the documented
+command set, every command's `--flags`, and both `--type` vocabularies. **Adding or renaming a
+command or option fails those tests until SKILL.md is updated too.** That guard exists because the
+README documented a `contact-detail` command that never existed — the real spelling is
+`wxq contacts --detail "<name>"`, while only the *MCP* tool is called `get_contact_detail`.
+
+Note that `--type` is two different vocabularies: `history`/`search` take message types
+(`text image voice video sticker location link file call system`), `favorites` takes
+`text image article card video`.
+
 ## Adding a command or MCP tool
 
 New CLI command: add `commands/<name>.py` with a Click command, then import and `cli.add_command()`
 it in `cli.py` (the imports are at the bottom with `# noqa: E402`). New MCP tool: append a `Tool` to
 `TOOLS` and add its `_handle_*` branch in `mcp/server.py`. If the feature involves querying
-messages, implement it in `services/message_service.py` first and have both call it.
+messages, implement it in `services/message_service.py` first and have both call it. Either way,
+update `SKILL.md`'s command table, or `tests/test_skill_doc.py` will fail.
