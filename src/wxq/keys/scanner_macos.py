@@ -251,11 +251,13 @@ def extract_keys(
         except OSError:
             pass
 
-    # Build salt → key mapping
+    # Build (salt or relative path) → key mapping.
+    # The C scanner writes {"db/path.db": {"enc_key": "..."}} — no salt field.
+    # Count keys by enc_key; salt is optional metadata used by older scanners.
     key_map: dict[str, str] = {}
-    for _rel, info in keys_data.items():
-        if isinstance(info, dict) and "enc_key" in info and "salt" in info:
-            key_map[info["salt"]] = info["enc_key"]
+    for rel, info in keys_data.items():
+        if isinstance(info, dict) and "enc_key" in info:
+            key_map[str(info.get("salt") or rel)] = str(info["enc_key"])
 
     print_fn(f"\n[+] Extracted {len(key_map)} keys, saved to: {output_path}")
     if not key_map:
